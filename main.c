@@ -5,7 +5,7 @@
 ** Login   <tavukc_k@epitech.net>
 **
 ** Started on  Wed Mar  4 11:13:37 2015 kevin tavukciyan
-** Last update Wed Mar  4 17:29:15 2015 Jhanzeeb Nayyer
+** Last update Wed Mar  4 18:43:10 2015 Jhanzeeb Nayyer
 */
 
 #include <sys/shm.h>
@@ -38,33 +38,31 @@ t_bool		initKey(t_settings *set)
 
 t_bool		initMemory(t_settings *set)
 {
-  if ((set->shm_id = shmget(set->key, MAPMAX_SIZE, SHM_R | SHM_W)) == -1)
+  if ((set->shm_id = shmget(set->key, getpagesize(), SHM_R | SHM_W)) == -1)
     {
-      if ((set->shm_id = shmget(set->key, MAPMAX_SIZE,
-				IPC_CREAT | SHM_R | SHM_W)) == -1)
-        return (FALSE);
-      printf("Creating shm [%d]\n", set->shm_id);
-      if ((set->addr = shmat(set->shm_id, NULL, SHM_R | SHM_W)) == (void *) -1)
-	return (FALSE);
-      printf("in start -> %p\n", set->addr);
-      /* sprintf((char *)addr, "Epitech Paris rox"); */
+      if ((set->shm_id = shmget(set->key, getpagesize(),
+      				IPC_CREAT | SHM_R | SHM_W)) != -1)
+	{
+	  printf("Creating shm [%d]\n", set->shm_id);
+	  if ((set->addr = shmat(set->shm_id, NULL, SHM_R | SHM_W)) == (void *) -1)
+	    return (FALSE);
+	  printf("%p <- after\n", set->addr);
+	  /* sprintf((char *)addr, "Epitech Paris rox"); */
+	  return (TRUE);
+	}
     }
-  else
-    {
-      printf("Already created [%d]\n", set->shm_id);
-      /* addr = shmat(set->shm_id, NULL, SHM_R | SHM_W); //vérification fonction */
-      /* printf("--> %s\n", (char *)addr); */
-      shmctl(set->shm_id, IPC_RMID, NULL); //vérification fonction
-    }
-  return (TRUE);
+  printf("Already created [%d]\n", set->shm_id);
+  shmctl(set->shm_id, IPC_RMID, NULL); //vérification fonction
+  return (FALSE);
 }
 
 t_bool		initMap(t_settings *set)
 {
-  int		map[10][10];
+  int		map[10][11];
 
-  memset(map, 0, sizeof(map)); //vérifier fonction
-  set->addr = (void *)map;
+  memset(map, EMPTY, sizeof(map));
+  snprintf((char *)set->addr, MAPMAX_SIZE, "%s", (char *)map);
+  printf("%d\n", ((char *)set->addr)[100]);
   return (TRUE);
 }
 
@@ -80,8 +78,6 @@ t_bool		start()
     return (FALSE);
   if (initMap(set) == FALSE)
     return (FALSE);
-  printf("%d hoho\n", map[0][0]);
-  printf("in start -> %p\n", set->addr);
   /* if (initSem() == FALSE) */
   /*   return (FALSE); */
   /* if (initMsg() == FALSE) */

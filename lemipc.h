@@ -5,7 +5,7 @@
 ** Login   <nayyer_j@epitech.net>
 ** 
 ** Started on  Wed Mar  4 15:26:42 2015 Jhanzeeb Nayyer
-** Last update Wed Mar  4 17:07:13 2015 Jhanzeeb Nayyer
+** Last update Wed Mar  4 18:26:40 2015 Jhanzeeb Nayyer
 */
 
 #ifndef LEMIPC_H_
@@ -14,7 +14,7 @@
 # include <sys/types.h>
 # include <sys/ipc.h>
 
-# define MAPMAX_SIZE (400)
+# define MAPMAX_SIZE (440)
 # define PATH_SIZE (1024)
 
 typedef enum	e_bool
