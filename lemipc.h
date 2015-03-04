@@ -5,7 +5,7 @@
 ** Login   <nayyer_j@epitech.net>
 ** 
 ** Started on  Wed Mar  4 15:26:42 2015 Jhanzeeb Nayyer
-** Last update Wed Mar  4 18:26:40 2015 Jhanzeeb Nayyer
+** Last update Wed Mar  4 20:21:28 2015 Jhanzeeb Nayyer
 */
 
 #ifndef LEMIPC_H_
@@ -28,7 +28,8 @@ typedef enum	e_state
     EMPTY,
     FIRST,
     SECOND,
-    THIRD
+    THIRD,
+    SEP = 42
   }		t_state;
 
 typedef struct	s_settings
@@ -38,6 +39,7 @@ typedef struct	s_settings
   int		msg_id;
   void		*addr;
   key_t		key;
+  struct sembuf	sops;
 }		t_settings;
 
 #endif /* !LEMIPC_H_ */

@@ -5,14 +5,15 @@
 ** Login   <tavukc_k@epitech.net>
 **
 ** Started on  Wed Mar  4 11:13:37 2015 kevin tavukciyan
-** Last update Wed Mar  4 18:43:10 2015 Jhanzeeb Nayyer
+** Last update Wed Mar  4 21:09:37 2015 Jhanzeeb Nayyer
 */
 
-#include <sys/shm.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/shm.h>
+#include <sys/sem.h>
 #include "lemipc.h"
 
 t_bool		initKey(t_settings *set)
@@ -38,31 +39,57 @@ t_bool		initKey(t_settings *set)
 
 t_bool		initMemory(t_settings *set)
 {
-  if ((set->shm_id = shmget(set->key, getpagesize(), SHM_R | SHM_W)) == -1)
+  if ((set->shm_id = shmget(set->key, MAPMAX_SIZE, SHM_R | SHM_W)) == -1)
     {
-      if ((set->shm_id = shmget(set->key, getpagesize(),
+      if ((set->shm_id = shmget(set->key, MAPMAX_SIZE,
       				IPC_CREAT | SHM_R | SHM_W)) != -1)
 	{
 	  printf("Creating shm [%d]\n", set->shm_id);
 	  if ((set->addr = shmat(set->shm_id, NULL, SHM_R | SHM_W)) == (void *) -1)
 	    return (FALSE);
-	  printf("%p <- after\n", set->addr);
-	  /* sprintf((char *)addr, "Epitech Paris rox"); */
 	  return (TRUE);
 	}
     }
   printf("Already created [%d]\n", set->shm_id);
-  shmctl(set->shm_id, IPC_RMID, NULL); //vérification fonction
+  shmctl(set->shm_id, IPC_RMID, NULL);
   return (FALSE);
 }
 
 t_bool		initMap(t_settings *set)
 {
-  int		map[10][11];
+  int		i;
+  int		map[10][10];
 
+  i = 0;
   memset(map, EMPTY, sizeof(map));
   snprintf((char *)set->addr, MAPMAX_SIZE, "%s", (char *)map);
-  printf("%d\n", ((char *)set->addr)[100]);
+  while (i < MAPMAX_SIZE)
+    {
+      if (i % 11 == 0)
+	((char *)set->addr)[i] = SEP;
+      ++i;
+    }
+  return (TRUE);
+}
+
+t_bool		initSem(t_settings *set)
+{
+  if ((set->sem_id = semget(set->key, 1, SHM_R | SHM_W)) == -1)
+    {
+      if ((set->sem_id = semget(set->key, 1, IPC_CREAT | SHM_R | SHM_W)) -1)
+	return (-1);
+      printf("sem_id = [%d]\n", set->sem_id);
+      semctl(set->sem_id, 0, SETVAL, 4);
+    }
+  else
+    {
+      printf("#1 value = %d\n", semctl(set->sem_id, 0, GETVAL));
+      set->sops.sem_num = 0;
+      set->sops.sem_op = 1;
+      set->sops.sem_flg = 0;
+      semop(set->sem_id, &set->sops, 1);
+      printf("#2 value = %d\n", semctl(set->sem_id, 0, GETVAL));
+    }
   return (TRUE);
 }
 
@@ -78,8 +105,8 @@ t_bool		start()
     return (FALSE);
   if (initMap(set) == FALSE)
     return (FALSE);
-  /* if (initSem() == FALSE) */
-  /*   return (FALSE); */
+  if (initSem(set) == FALSE)
+    return (FALSE);
   /* if (initMsg() == FALSE) */
   /*   return (FALSE); */
   free(set);
