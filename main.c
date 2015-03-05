@@ -5,7 +5,7 @@
 ** Login   <tavukc_k@epitech.net>
 **
 ** Started on  Wed Mar  4 11:13:37 2015 kevin tavukciyan
-** Last update Thu Mar  5 15:27:19 2015 Jhanzeeb Nayyer
+** Last update Thu Mar  5 15:45:59 2015 kevin tavukciyan
 */
 
 #include <stdio.h>
@@ -69,6 +69,7 @@ t_bool		initMap(t_settings *set)
       if (i % 11 == 0)
 	((char *)set->addr)[i] = SEP;
       ++i;
+      //    printf("%d\n", ((char*)set->addr)[100]);
     }
   return (TRUE);
 }
@@ -84,10 +85,9 @@ t_bool		setMap(t_settings *set)
     {
       if (i % 10 == 0)
 	++j;
-      /* if (j > 4 && j < 7 && i % 10 == 0 && ((char *)set->addr)[i] == EMPTY) */
-      /* 	((char *)set->addr)[i] = FIRST; */
-      /* printf("%d\n", ((char *)set->addr)[i]); */
-      (void)set;
+      if (j > 4 && j < 7 && i % 10 == 0 && ((char *)set->addr)[i] == EMPTY)
+      	((char *)set->addr)[i] = FIRST;
+      //      printf("%d\n", ((char *)set->addr)[i]);
       ++i;
     }
   return (TRUE);
@@ -118,6 +118,14 @@ t_bool		initSem(t_settings *set)
 ** Catcher sigkill, sigterm
 */
 
+t_bool		readMap(t_settings *set)
+{
+  if ((set->addr = shmat(set->shm_id, NULL, SHM_R | SHM_W)) == (void *) -1)
+    return (FALSE);
+  printf("%d\n",((char*)set->addr)[0]);
+  return (TRUE);
+}
+
 t_bool		start()
 {
   t_settings	*set;
@@ -126,7 +134,7 @@ t_bool		start()
     return (FALSE);
   if (initKey(set) == FALSE)
     return (FALSE);
-  if ((shmget(set->key, MAPMAX_SIZE, SHM_R | SHM_W)) == -1)
+  if ((set->shm_id = shmget(set->key, MAPMAX_SIZE, SHM_R | SHM_W)) == -1)
     {
       if (initMemory(set) == FALSE)
   	return (FALSE);
@@ -135,6 +143,9 @@ t_bool		start()
     }
   if (initSem(set) == FALSE)
     return (FALSE);
+  if (readMap(set) == FALSE)
+    return (FALSE);
+  printf("%d\n", 1);
   setMap(set);
   /* if (initMsg() == FALSE) */
   /*   return (FALSE); */
