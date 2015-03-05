@@ -5,7 +5,7 @@
 ** Login   <nayyer_j@epitech.net>
 ** 
 ** Started on  Wed Mar  4 15:26:42 2015 Jhanzeeb Nayyer
-** Last update Wed Mar  4 20:21:28 2015 Jhanzeeb Nayyer
+** Last update Thu Mar  5 14:48:22 2015 Jhanzeeb Nayyer
 */
 
 #ifndef LEMIPC_H_
@@ -29,6 +29,7 @@ typedef enum	e_state
     FIRST,
     SECOND,
     THIRD,
+    FOURTH,
     SEP = 42
   }		t_state;
 

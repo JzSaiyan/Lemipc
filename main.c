@@ -5,7 +5,7 @@
 ** Login   <tavukc_k@epitech.net>
 **
 ** Started on  Wed Mar  4 11:13:37 2015 kevin tavukciyan
-** Last update Wed Mar  4 21:09:37 2015 Jhanzeeb Nayyer
+** Last update Thu Mar  5 15:27:19 2015 Jhanzeeb Nayyer
 */
 
 #include <stdio.h>
@@ -49,9 +49,10 @@ t_bool		initMemory(t_settings *set)
 	    return (FALSE);
 	  return (TRUE);
 	}
+      else
+	printf("Already created [%d]\n", set->shm_id);
     }
-  printf("Already created [%d]\n", set->shm_id);
-  shmctl(set->shm_id, IPC_RMID, NULL);
+  /* shmctl(set->shm_id, IPC_RMID, NULL); */
   return (FALSE);
 }
 
@@ -72,12 +73,32 @@ t_bool		initMap(t_settings *set)
   return (TRUE);
 }
 
+t_bool		setMap(t_settings *set)
+{
+  int		i;
+  int		j;
+
+  i = 1;
+  j = 0;
+  while (i < MAPMAX_SIZE)
+    {
+      if (i % 10 == 0)
+	++j;
+      /* if (j > 4 && j < 7 && i % 10 == 0 && ((char *)set->addr)[i] == EMPTY) */
+      /* 	((char *)set->addr)[i] = FIRST; */
+      /* printf("%d\n", ((char *)set->addr)[i]); */
+      (void)set;
+      ++i;
+    }
+  return (TRUE);
+}
+
 t_bool		initSem(t_settings *set)
 {
   if ((set->sem_id = semget(set->key, 1, SHM_R | SHM_W)) == -1)
     {
-      if ((set->sem_id = semget(set->key, 1, IPC_CREAT | SHM_R | SHM_W)) -1)
-	return (-1);
+      if ((set->sem_id = semget(set->key, 1, IPC_CREAT | SHM_R | SHM_W)) == -1)
+	return (FALSE);
       printf("sem_id = [%d]\n", set->sem_id);
       semctl(set->sem_id, 0, SETVAL, 4);
     }
@@ -85,13 +106,17 @@ t_bool		initSem(t_settings *set)
     {
       printf("#1 value = %d\n", semctl(set->sem_id, 0, GETVAL));
       set->sops.sem_num = 0;
-      set->sops.sem_op = 1;
+      set->sops.sem_op = -1;
       set->sops.sem_flg = 0;
-      semop(set->sem_id, &set->sops, 1);
+      semop(set->sem_id, &(set)->sops, 1);
       printf("#2 value = %d\n", semctl(set->sem_id, 0, GETVAL));
     }
   return (TRUE);
 }
+
+/*
+** Catcher sigkill, sigterm
+*/
 
 t_bool		start()
 {
@@ -101,12 +126,16 @@ t_bool		start()
     return (FALSE);
   if (initKey(set) == FALSE)
     return (FALSE);
-  if (initMemory(set) == FALSE)
-    return (FALSE);
-  if (initMap(set) == FALSE)
-    return (FALSE);
+  if ((shmget(set->key, MAPMAX_SIZE, SHM_R | SHM_W)) == -1)
+    {
+      if (initMemory(set) == FALSE)
+  	return (FALSE);
+      if (initMap(set) == FALSE)
+	return (FALSE);
+    }
   if (initSem(set) == FALSE)
     return (FALSE);
+  setMap(set);
   /* if (initMsg() == FALSE) */
   /*   return (FALSE); */
   free(set);
