@@ -5,7 +5,7 @@
 ** Login   <tavukc_k@epitech.net>
 **
 ** Started on  Wed Mar  4 11:13:37 2015 kevin tavukciyan
-** Last update Thu Mar  5 15:45:59 2015 kevin tavukciyan
+** Last update Thu Mar  5 17:55:56 2015 kevin tavukciyan
 */
 
 #include <stdio.h>
@@ -14,7 +14,13 @@
 #include <unistd.h>
 #include <sys/shm.h>
 #include <sys/sem.h>
+#include <time.h>
 #include "lemipc.h"
+
+/* je tape ici mes trucs */
+/* Pour le setTeamBegin je fais remettre toutes les equipes presentes dans la game a leur place*/
+/* On ne doit rappeller le setTeamBegin qu'a l'entree de nouveaux clients pas a la mort d'un client */
+
 
 t_bool		initKey(t_settings *set)
 {
@@ -69,7 +75,6 @@ t_bool		initMap(t_settings *set)
       if (i % 11 == 0)
 	((char *)set->addr)[i] = SEP;
       ++i;
-      //    printf("%d\n", ((char*)set->addr)[100]);
     }
   return (TRUE);
 }
@@ -87,7 +92,6 @@ t_bool		setMap(t_settings *set)
 	++j;
       if (j > 4 && j < 7 && i % 10 == 0 && ((char *)set->addr)[i] == EMPTY)
       	((char *)set->addr)[i] = FIRST;
-      //      printf("%d\n", ((char *)set->addr)[i]);
       ++i;
     }
   return (TRUE);
@@ -122,15 +126,50 @@ t_bool		readMap(t_settings *set)
 {
   if ((set->addr = shmat(set->shm_id, NULL, SHM_R | SHM_W)) == (void *) -1)
     return (FALSE);
-  printf("%d\n",((char*)set->addr)[0]);
   return (TRUE);
 }
 
+/* sem = 4 = EMPTY
+   sem = 3 = FIRST
+   sem = 2 = SECOND
+   sem = 1 = THIRD
+   sem = 0 = FOURTH */
+
+/* Pour savoir quel state mettre faire 4 - i = state a mettre */
+
+t_bool		setTeamBegin(t_settings *set)
+{
+  int		i;
+  int		j;
+  unsigned int	rand;
+
+  printf("Valeur de Getval: %d\n", semctl(set->sem_id, 0, GETVAL));
+  i = 4 - semctl(set->sem_id, 0, GETVAL);
+  j = 0;
+  printf("Valeur de I: %d\n", i);
+  while (i > 0)
+    {
+      while (j < 4)
+	{
+	  rand = random() % (100 - 1);
+	  if (((char*)set->addr)[rand] == EMPTY)
+	    {
+	      ((char*)set->addr)[rand] = FOURTH - i;
+	      ++j;
+	    }
+	}
+      --i;
+      j = 0;
+    }
+  for(i = 0; i < 100; i++)
+    printf("%d\n", ((char*)set->addr)[i]);
+  return (TRUE);
+}
 t_bool		start()
 {
   t_settings	*set;
 
- if ((set = malloc(sizeof(t_settings))) == NULL)
+  if ((set = malloc(sizeof(t_settings))) == NULL)
     return (FALSE);
   if (initKey(set) == FALSE)
     return (FALSE);
@@ -141,20 +180,23 @@ t_bool		start()
       if (initMap(set) == FALSE)
 	return (FALSE);
     }
+  else
+    {
+      if (readMap(set) == FALSE)
+	return (FALSE);
+      if (setTeamBegin(set) == FALSE)
+	return (FALSE);
+    }
+  setMap(set);
   if (initSem(set) == FALSE)
     return (FALSE);
-  if (readMap(set) == FALSE)
-    return (FALSE);
-  printf("%d\n", 1);
-  setMap(set);
-  /* if (initMsg() == FALSE) */
-  /*   return (FALSE); */
   free(set);
   return (TRUE);
 }
 
 int		main(void)
 {
+  srandom(time(NULL));
   if (start() == FALSE)
     return (-1);
   return (0);
