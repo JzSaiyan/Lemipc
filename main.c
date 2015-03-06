@@ -5,7 +5,7 @@
 ** Login   <tavukc_k@epitech.net>
 **
 ** Started on  Wed Mar  4 11:13:37 2015 kevin tavukciyan
-** Last update Fri Mar  6 13:46:46 2015 Jhanzeeb Nayyer
+** Last update Fri Mar  6 14:04:55 2015 Jhanzeeb Nayyer
 */
 
 #include <stdio.h>
@@ -141,7 +141,7 @@ t_bool		setTeamBegin(t_settings *set)
 	  rand = random() % (100 + 1);
 	  if (((char*)set->addr)[rand] == EMPTY)
 	    {
-	      ((char*)set->addr)[rand] = FOURTH - i;
+	      ((char*)set->addr)[rand] = 5 - i;
 	      ++j;
 	    }
 	}
