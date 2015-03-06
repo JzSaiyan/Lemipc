@@ -5,7 +5,7 @@
 ## Login   <tavukc_k@epitech.net>
 ##
 ## Started on  Wed Mar  4 11:12:58 2015 kevin tavukciyan
-## Last update Wed Mar  4 11:25:08 2015 kevin tavukciyan
+## Last update Fri Mar  6 13:02:46 2015 Jhanzeeb Nayyer
 ##
 
 CC      =       gcc
@@ -14,17 +14,27 @@ RM      =       rm -f
 
 NAME    =       lemipc
 
-CFLAGS  =       -Wall -Wextra -Werror
+NAMELIB	=	Guilemipc
+
+CFLAGS  +=      -Wall -Wextra -Werror
+
+LDFLAGS	+=	-lSDL -lSDL_mixer
 
 SRCS    =      	main.c
 
+SRCSLIB	=	./Gui/main.c
+
 OBJS    =       $(SRCS:.c=.o)
 
-all     :       $(NAME)
+OBJSLIB	=	$(SRCSLIB:.c=.o)
+
+all     :       $(NAME) $(NAMELIB)
 
 $(NAME) :       $(OBJS)
 		$(CC) -o $(NAME) $(OBJS)
 
+$(NAMELIB):	$(OBJSLIB)
+		$(CC) -o $(NAMELIB) $(OBJSLIB) $(LDFLAGS)
 clean   :
 		$(RM) $(OBJS)
 

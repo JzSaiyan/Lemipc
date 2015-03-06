@@ -5,7 +5,7 @@
 ** Login   <tavukc_k@epitech.net>
 **
 ** Started on  Wed Mar  4 11:13:37 2015 kevin tavukciyan
-** Last update Thu Mar  5 17:55:56 2015 kevin tavukciyan
+** Last update Fri Mar  6 13:46:46 2015 Jhanzeeb Nayyer
 */
 
 #include <stdio.h>
@@ -20,7 +20,6 @@
 /* je tape ici mes trucs */
 /* Pour le setTeamBegin je fais remettre toutes les equipes presentes dans la game a leur place*/
 /* On ne doit rappeller le setTeamBegin qu'a l'entree de nouveaux clients pas a la mort d'un client */
-
 
 t_bool		initKey(t_settings *set)
 {
@@ -76,23 +75,11 @@ t_bool		initMap(t_settings *set)
 	((char *)set->addr)[i] = SEP;
       ++i;
     }
-  return (TRUE);
-}
-
-t_bool		setMap(t_settings *set)
-{
-  int		i;
-  int		j;
-
-  i = 1;
-  j = 0;
-  while (i < MAPMAX_SIZE)
+  for(i = 1; i < 100; i++)
     {
-      if (i % 10 == 0)
-	++j;
-      if (j > 4 && j < 7 && i % 10 == 0 && ((char *)set->addr)[i] == EMPTY)
-      	((char *)set->addr)[i] = FIRST;
-      ++i;
+      printf("%d ", ((char*)set->addr)[i]);
+      if (((char*)set->addr)[i] == SEP)
+	printf("\n");
     }
   return (TRUE);
 }
@@ -144,14 +131,14 @@ t_bool		setTeamBegin(t_settings *set)
   unsigned int	rand;
 
   printf("Valeur de Getval: %d\n", semctl(set->sem_id, 0, GETVAL));
-  i = 4 - semctl(set->sem_id, 0, GETVAL);
+  i = 5 - semctl(set->sem_id, 0, GETVAL);
   j = 0;
   printf("Valeur de I: %d\n", i);
   while (i > 0)
     {
       while (j < 4)
 	{
-	  rand = random() % (100 - 1);
+	  rand = random() % (100 + 1);
 	  if (((char*)set->addr)[rand] == EMPTY)
 	    {
 	      ((char*)set->addr)[rand] = FOURTH - i;
@@ -161,10 +148,30 @@ t_bool		setTeamBegin(t_settings *set)
       --i;
       j = 0;
     }
-  for(i = 0; i < 100; i++)
-    printf("%d\n", ((char*)set->addr)[i]);
+  for(i = 1; i < 100; i++)
+    {
+      printf("%d ", ((char*)set->addr)[i]);
+      if (((char*)set->addr)[i] == SEP)
+	printf("\n");
+    }
   return (TRUE);
 }
+
+/* void		moveCharacter(t_settings *set, t_move move, int pos) */
+/* { */
+/*   void		(*ptrfunc[8])(int); */
+
+/*   ptrfunc[MOVE_RIGHT] = &moveRight; */
+/*   ptrfunc[MOVE_LEFT] = &moveLeft; */
+/*   ptrfunc[MOVE_UP] = &moveUp; */
+/*   ptrfunc[MOVE_DOWN] = &moveDown; */
+/*   ptrfunc[MOVE_DIG_UP_RIGHT] = &moveDigUpRight; */
+/*   ptrfunc[MOVE_DIG_UP_LEFT] = &moveDigUpLeft; */
+/*   ptrfunc[MOVE_DIG_DOWN_RIGHT] = &moveDigDownRight; */
+/*   ptrfunc[MOVE_DIG_DOWN_LEFT] = &moveDigDownLeft; */
+/*   (*ptrfunc[move])(set, pos); */
+/* } */
+
 t_bool		start()
 {
   t_settings	*set;
@@ -184,10 +191,10 @@ t_bool		start()
     {
       if (readMap(set) == FALSE)
 	return (FALSE);
-      if (setTeamBegin(set) == FALSE)
-	return (FALSE);
+      if ((set->sem_id = semget(set->key, 1, SHM_R | SHM_W)) != -1)
+	if (setTeamBegin(set) == FALSE)
+	  return (FALSE);
     }
-  setMap(set);
   if (initSem(set) == FALSE)
     return (FALSE);
   free(set);

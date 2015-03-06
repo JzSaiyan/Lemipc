@@ -5,7 +5,7 @@
 ** Login   <nayyer_j@epitech.net>
 ** 
 ** Started on  Wed Mar  4 15:26:42 2015 Jhanzeeb Nayyer
-** Last update Thu Mar  5 14:48:22 2015 Jhanzeeb Nayyer
+** Last update Thu Mar  5 18:31:35 2015 Jhanzeeb Nayyer
 */
 
 #ifndef LEMIPC_H_
@@ -32,6 +32,18 @@ typedef enum	e_state
     FOURTH,
     SEP = 42
   }		t_state;
+
+typedef enum	e_move
+  {
+    MOVE_RIGHT,
+    MOVE_LEFT,
+    MOVE_UP,
+    MOVE_DOWN,
+    MOVE_DIG_UP_RIGHT,
+    MOVE_DIG_UP_LEFT,
+    MOVE_DIG_DOWN_RIGHT,
+    MOVE_DIG_DOWN_LEFT
+  }		t_move;
 
 typedef struct	s_settings
 {
