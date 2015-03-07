@@ -5,7 +5,7 @@
 ** Login   <tavukc_k@epitech.net>
 **
 ** Started on  Wed Mar  4 11:13:37 2015 kevin tavukciyan
-** Last update Fri Mar  6 14:04:55 2015 Jhanzeeb Nayyer
+** Last update Sat Mar  7 18:04:04 2015 kevin tavukciyan
 */
 
 #include <stdio.h>
@@ -15,11 +15,14 @@
 #include <sys/shm.h>
 #include <sys/sem.h>
 #include <time.h>
+#include <signal.h>
 #include "lemipc.h"
 
 /* je tape ici mes trucs */
 /* Pour le setTeamBegin je fais remettre toutes les equipes presentes dans la game a leur place*/
 /* On ne doit rappeller le setTeamBegin qu'a l'entree de nouveaux clients pas a la mort d'un client */
+
+t_settings	*set;
 
 t_bool		initKey(t_settings *set)
 {
@@ -57,7 +60,6 @@ t_bool		initMemory(t_settings *set)
       else
 	printf("Already created [%d]\n", set->shm_id);
     }
-  /* shmctl(set->shm_id, IPC_RMID, NULL); */
   return (FALSE);
 }
 
@@ -92,6 +94,7 @@ t_bool		initSem(t_settings *set)
 	return (FALSE);
       printf("sem_id = [%d]\n", set->sem_id);
       semctl(set->sem_id, 0, SETVAL, 4);
+      printf("counter %d\n", semctl(set->sem_id, 0, GETVAL));
     }
   else
     {
@@ -172,13 +175,50 @@ t_bool		setTeamBegin(t_settings *set)
 /*   (*ptrfunc[move])(set, pos); */
 /* } */
 
+t_bool		ia()
+{
+  return (TRUE);
+}
+
+void		handler_sig(int signum)
+{
+  int		retval;
+
+  (void)signum;
+  if ((retval = semctl(set->sem_id, 0, GETVAL)) == -1)
+    return ;
+  if (retval == 3)
+    {
+      if ((shmctl(set->shm_id, IPC_RMID, NULL)) == -1)
+	return ;
+      if ((semctl(set->sem_id, 0, IPC_RMID)) == -1)
+	return ;
+    }
+  kill(getpid(), 9);
+}
+
+t_bool		catch_signal()
+{
+  if ((signal(SIGINT, &handler_sig)) == SIG_ERR)
+    return (FALSE);
+  if (signal(SIGTERM, &handler_sig) == SIG_ERR)
+    return (FALSE);
+  if (signal(SIGHUP, &handler_sig) == SIG_ERR)
+    return (FALSE);
+  if (signal(SIGQUIT, &handler_sig) == SIG_ERR)
+    return (FALSE);
+  return (TRUE);
+}
+
 t_bool		start()
 {
-  t_settings	*set;
-
   if ((set = malloc(sizeof(t_settings))) == NULL)
     return (FALSE);
   if (initKey(set) == FALSE)
+    return (FALSE);
+  if (catch_signal(set) == FALSE)
+    return (FALSE);
+  if (initSem(set) == FALSE)
     return (FALSE);
   if ((set->shm_id = shmget(set->key, MAPMAX_SIZE, SHM_R | SHM_W)) == -1)
     {
@@ -189,14 +229,15 @@ t_bool		start()
     }
   else
     {
-      if (readMap(set) == FALSE)
-	return (FALSE);
-      if ((set->sem_id = semget(set->key, 1, SHM_R | SHM_W)) != -1)
-	if (setTeamBegin(set) == FALSE)
-	  return (FALSE);
+      while (1)
+	{
+	  if (readMap(set) == FALSE)
+	    return (FALSE);
+	  if ((set->sem_id = semget(set->key, 1, SHM_R | SHM_W)) != -1)
+	    if (setTeamBegin(set) == FALSE)
+	      return (FALSE);
+	}
     }
-  if (initSem(set) == FALSE)
-    return (FALSE);
   free(set);
   return (TRUE);
 }
