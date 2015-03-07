@@ -5,7 +5,7 @@
 ## Login   <nayyer_j@epitech.net>
 ## 
 ## Started on  Tue Feb  3 22:42:17 2015 Jhanzeeb Nayyer
-## Last update Fri Mar  6 00:35:37 2015 Jhanzeeb Nayyer
+## Last update Sat Mar  7 16:38:43 2015 Jhanzeeb Nayyer
 ##
 
 CC	= gcc
@@ -16,7 +16,7 @@ LDFLAGS	+= -lSDL -lSDL_mixer
 
 NAME	= Mario
 
-SRCS	= main.c
+SRCS	= mainGui.c
 
 OBJS	= $(SRCS:.c=.o)
 

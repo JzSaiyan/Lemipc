@@ -5,16 +5,12 @@
 ** Login   <nayyer_j@epitech.net>
 ** 
 ** Started on  Wed Feb  4 19:11:34 2015 Jhanzeeb Nayyer
-** Last update Fri Mar  6 00:34:34 2015 Jhanzeeb Nayyer
+** Last update Fri Mar  6 14:11:05 2015 Jhanzeeb Nayyer
 */
 
 #ifndef _LIST_H_
 # define _LIST_H_
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
 
 typedef enum	e_bool
   {

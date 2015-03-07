@@ -5,7 +5,7 @@
 ## Login   <tavukc_k@epitech.net>
 ##
 ## Started on  Wed Mar  4 11:12:58 2015 kevin tavukciyan
-## Last update Fri Mar  6 13:02:46 2015 Jhanzeeb Nayyer
+## Last update Sat Mar  7 17:00:00 2015 Jhanzeeb Nayyer
 ##
 
 CC      =       gcc
@@ -22,7 +22,7 @@ LDFLAGS	+=	-lSDL -lSDL_mixer
 
 SRCS    =      	main.c
 
-SRCSLIB	=	./Gui/main.c
+SRCSLIB	=	./Gui/mainGui.c
 
 OBJS    =       $(SRCS:.c=.o)
 

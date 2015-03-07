@@ -5,7 +5,7 @@
 ** Login   <nayyer_j@epitech.net>
 ** 
 ** Started on  Tue Feb  3 22:42:29 2015 Jhanzeeb Nayyer
-** Last update Fri Mar  6 00:38:20 2015 Jhanzeeb Nayyer
+** Last update Fri Mar  6 14:11:34 2015 Jhanzeeb Nayyer
 */
 
 #include "list.h"
@@ -29,7 +29,6 @@ int		main(void)
   positionZozor.y = ecran->h / 2 - zozor->h / 2;
 
   SDL_EnableKeyRepeat(10, 10); /* Activation de la répétition des touches */
-
   while (continuer)
     {
       SDL_WaitEvent(&event);
