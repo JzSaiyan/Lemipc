@@ -1,2 +1,2 @@
 # Lemipc
-lemipc de ma gueule
+Lemipc Epitech 2014
